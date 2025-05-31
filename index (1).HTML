@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mac AI Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen bg-black text-white relative">
+    <video autoplay muted loop class="video-bg">
+        <source src="your_video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="glass max-w-2xl w-full text-center space-y-6">
+        <h1 class="text-4xl font-bold text-cyan-300 animate-bounce">Welcome to Mac AI</h1>
+        <p class="text-lg">Your personal smart assistant with voice control, jokes, music, Hindi mode and more!</p>
+
+        <div class="flex flex-col items-center space-y-4">
+            <button onclick="startListening()" class="bg-cyan-500 text-white px-6 py-2 rounded-full shadow-md hover:bg-cyan-600 transition">🎙️ Speak to Mac AI</button>
+            <p id="userText" class="text-white font-medium"></p>
+            <p id="macResponse" class="text-green-300 text-lg font-semibold"></p>
+        </div>
+    </div>
+
+    <script>
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        function startListening() {
+            recognition.start();
+            document.getElementById('macResponse').innerText = "Listening...";
+
+            recognition.onresult = function(event) {
+                const text = event.results[0][0].transcript;
+                document.getElementById('userText').innerText = `You said: "${text}"`;
+                getResponse(text);
+            };
+
+            recognition.onerror = function(event) {
+                document.getElementById('macResponse').innerText = "Error: " + event.error;
+            }
+        }
+
+        function getResponse(input) {
+            let response = "";
+
+            if (input.includes("hello") || input.includes("hi")) {
+                response = "Hello! I'm Mac AI, how can I help you today?";
+            } else if (input.includes("joke")) {
+                response = "Why don't scientists trust atoms? Because they make up everything!";
+            } else if (input.includes("hindi")) {
+                response = "Namaste! Ab se hum Hindi mein baat karenge.";
+            } else if (input.includes("play music") || input.includes("play song")) {
+                response = "Playing your favorite song 🎵";
+                // Simulate music with a sound or link
+            } else if (input.includes("how are you")) {
+                response = "I'm functioning perfectly! Thanks for asking.";
+            } else {
+                response = "Sorry, I didn't understand that. Please try again.";
+            }
+
+            document.getElementById('macResponse').innerText = response;
+            speak(response);
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.pitch = 1;
+            utterance.rate = 1;
+            utterance.voice = speechSynthesis.getVoices().find(voice => voice.name.includes("Male") || voice.name.includes("David") || voice.name.includes("Google UK English Male"));
+            speechSynthesis.speak(utterance);
+        }
+    </script>
+</body>
+
+</html>
